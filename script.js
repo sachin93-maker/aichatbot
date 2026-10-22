@@ -4,7 +4,7 @@ let chatContainer=document.querySelector(".chat-container")
 let imagebtn=document.querySelector("#image")
 let imageinput=document.querySelector("#image input")
 
-const Api_Url = "/.netlify/functions/chat"; 
+const Api_Url="https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=AQ.Ab8RN6IVciv4MVZ-iD7EhkXe4MpkbkBqQfVI5dfdkTF04KoFrA" 
 let user={
     message:null,
     file:{
@@ -13,56 +13,41 @@ let user={
 }
 }
 
+async function generateResponse(aiChatBox){
 
-async function generateResponse(aiChatBox) {
-    const text = aiChatBox.querySelector(".ai-chat-area");
-
-    const parts = [{ text: user.message }];
-
-    if (user.file?.data && user.file?.mime_type) {
-        parts.push({
-            inline_data: {
-                mime_type: user.file.mime_type,
-                data: user.file.data
-            }
-        });
+    let text=aiChatBox.querySelector(".ai-chat-area")
+    let RequestOption={
+        method:"POST",
+        headers:{'Content-Type': 'application/json'},
+        body:JSON.stringify({
+            "contents": [
+                {
+                  "parts": [
+                    {
+                      "text":user.message
+                    },(user.file.data?[{"inline_data":user.file}]:[])
+                  ]
+                }
+              ]
+        })
+    }
+    try{
+        let response=await fetch(Api_Url,RequestOption)
+        let data=await response.json()
+        let apiResponse=data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g,"$1").trim()
+        text.innerHTML=apiResponse
+    }
+    catch(error){
+        console.log(error);
     }
 
-    try {
-        const response = await fetch(Api_Url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ parts })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.error || "Request failed");
-        }
-
-        text.textContent = data.text ||
-            "Sorry, I couldn't generate a response.";
-
-    } catch (error) {
-        console.error("Chatbot error:", error);
-        text.textContent =
-            "Sorry, something went wrong. Please try again.";
-    } finally {
-        chatContainer.scrollTo({
-            top: chatContainer.scrollHeight,
-            behavior: "smooth"
-        });
-
-        user.file = {
-            mime_type: null,
-            data: null
-        };
+    finally{
+        chatContainer.scrollTo({top:chatContainer.scrollHeight,behavior:"smooth"})
+        user.file={}
     }
+
+   // let response=fetch(Api_Url,RequestOption)
 }
-
 
 function createChatBox(html,classes){
     let div=document.createElement("div")
