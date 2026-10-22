@@ -4,7 +4,7 @@ let chatContainer=document.querySelector(".chat-container")
 let imagebtn=document.querySelector("#image")
 let imageinput=document.querySelector("#image input")
 
-const Api_Url="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCz4q1YJpNV5FuL_DsaA4Vew2rAIsRoPVw" 
+const Api_Url="https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=AQ.Ab8RN6IVciv4MVZ-iD7EhkXe4MpkbkBqQfVI5dfdkTF04KoFrA" 
 let user={
     message:null,
     file:{
